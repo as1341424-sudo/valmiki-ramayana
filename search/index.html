@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Śrī Vālmīki Rāmāyaṇa — Searchable Corpus</title>
+  <meta name="description" content="Full-text searchable digital corpus of Śrī Vālmīki Rāmāyaṇa with Sanskrit, transliteration, word-by-word meaning, translation and commentary.">
+  <!-- Fonts served locally — works fully offline -->
+  <link rel="stylesheet" href="/search/fonts/fonts.css">
+  <link rel="stylesheet" href="/search/style.css">
+</head>
+<body>
+  <!-- ── HEADER ─────────────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand-container">
+        <img src="/search/iskcon_lotus_symbol.jpg" alt="ISKCON Lotus Symbol" class="header-iskcon-logo">
+        <div class="brand">
+          <div class="brand-devanagari">श्रीवाल्मीकिरामायणम्</div>
+          <div class="brand-latin">Śrī Vālmīki Rāmāyaṇa</div>
+        </div>
+      </div>
+      <div class="header-stats" id="headerStats">
+        <span class="stat-pill" id="statVerses">—</span>
+        <span class="stat-divider">·</span>
+        <span class="stat-pill" id="statKandas">3 Kāṇḍas</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── HERO / SEARCH ─────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="hero-subtitle">Search across Sanskrit · Transliteration · Translation · Commentary</p>
+
+      <div class="search-box-wrap">
+        <div class="search-box" id="searchBox">
+          <span class="search-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </span>
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Search or enter a verse reference like 1.1.1 …"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <button class="search-clear" id="searchClear" title="Clear" style="display:none">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="search-filters">
+          <select id="filterKanda" class="filter-select">
+            <option value="">All Kāṇḍas</option>
+            <option value="1">1 · Bāla-kāṇḍa</option>
+            <option value="2">2 · Ayodhyā-kāṇḍa</option>
+            <option value="3">3 · Āraṇya-kāṇḍa</option>
+            <option value="4">4 · Kiṣkindhā-kāṇḍa</option>
+            <option value="5">5 · Sundara-kāṇḍa</option>
+            <option value="6">6 · Yuddha-kāṇḍa</option>
+            <option value="7">7 · Uttara-kāṇḍa</option>
+          </select>
+          <div class="filter-toggle-group">
+            <button class="field-toggle active" data-field="translation" title="Translation">Trans.</button>
+            <button class="field-toggle active" data-field="commentary" title="Commentary">Comm.</button>
+            <button class="field-toggle active" data-field="sanskrit" title="Sanskrit">Skt.</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="search-hints">
+        <span class="hint">Try: <a href="#" class="hint-link" data-query="Narada">Narada</a></span>
+        <span class="hint">·</span>
+        <span class="hint"><a href="#" class="hint-link" data-query="Sita">Sita</a></span>
+        <span class="hint">·</span>
+        <span class="hint"><a href="#" class="hint-ref" data-ref="1.1.1">1.1.1</a></span>
+        <span class="hint">·</span>
+        <span class="hint"><a href="#" class="hint-ref" data-ref="1.1.8">1.1.8</a></span>
+        <span class="hint">·</span>
+        <span class="hint"><a href="#" class="hint-query" data-query="surrender devotional service">surrender</a></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MAIN CONTENT ──────────────────────────────────────── -->
+  <main class="main-content">
+
+    <!-- Loading -->
+    <div class="loading-wrap" id="loadingWrap" style="display:none">
+      <div class="spinner"></div>
+      <p>Searching the Rāmāyaṇa…</p>
+    </div>
+
+    <!-- Error -->
+    <div class="error-wrap" id="errorWrap" style="display:none">
+      <div class="error-icon">⚠</div>
+      <p id="errorMsg">Something went wrong.</p>
+      <p class="error-hint">Make sure the API server is running: <code>python server/api.py</code></p>
+    </div>
+
+    <!-- Results header -->
+    <div class="results-header" id="resultsHeader" style="display:none">
+      <span id="resultsCount"></span>
+      <div class="sort-wrap">
+        <span class="sort-label">Sort:</span>
+        <select id="sortSelect" class="filter-select small">
+          <option value="relevance">Relevance</option>
+          <option value="ref">Verse order</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Results list -->
+    <div class="results-list" id="resultsList"></div>
+
+    <!-- Single verse view -->
+    <div class="verse-view" id="verseView" style="display:none"></div>
+
+    <!-- Welcome / empty state -->
+    <div class="welcome-state" id="welcomeState">
+      <div class="welcome-kandas" id="welcomeKandas">
+        <div class="wk-title">Available Kāṇḍas</div>
+        <div class="wk-grid" id="kandaGrid">
+          <div class="kanda-card skeleton"></div>
+          <div class="kanda-card skeleton"></div>
+          <div class="kanda-card skeleton"></div>
+        </div>
+      </div>
+
+      <div class="welcome-info">
+        <div class="info-block">
+          <div class="info-icon">📖</div>
+          <div class="info-text">
+            <strong>Verse lookup</strong>
+            <p>Type <code>1.1.1</code> to jump directly to Kāṇḍa 1, Chapter 1, Verse 1.
+               Combined verses like <code>1.1.19</code> or <code>1.1.20</code> both retrieve the 19–20 entry.</p>
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="info-icon">🔍</div>
+          <div class="info-text">
+            <strong>Full-text search</strong>
+            <p>Searches across Sanskrit, transliteration, word-by-word meaning, English translation, and commentary simultaneously.</p>
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="info-icon">🗂</div>
+          <div class="info-text">
+            <strong>Filter by Kāṇḍa</strong>
+            <p>Use the dropdown to narrow results to a specific book, or browse chapter-by-chapter.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load more -->
+    <div class="load-more-wrap" id="loadMoreWrap" style="display:none">
+      <button class="btn-load-more" id="loadMoreBtn">Load more results</button>
+    </div>
+
+  </main>
+
+  <!-- ── VERSE DETAIL MODAL ────────────────────────────────── -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="verseModal">
+      <button class="modal-close" id="modalClose" title="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────── -->
+  <footer class="site-footer">
+    <p>Content sourced from <a href="https://srivalmikiramayana.com" target="_blank" rel="noopener">srivalmikiramayana.com</a>
+       · Rūpa Raghunātha Vāṇī Publications · Local corpus for research &amp; study</p>
+  </footer>
+
+  <script src="/search/app.js"></script>
+</body>
+</html>

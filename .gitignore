@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+.Python
+.venv/
+venv/
+env/
+
+# Environment / Secrets
+.env
+*.env
+
+# Scraping logs (not needed for deployment)
+data/scrape.log
+data/scrape_*.log
+
+# Per-verse JSON backups (DB has all data, JSONs are redundant)
+data/json/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary
+*.tmp
+*.bak
+
+# NOTE: data/ramayana.db IS committed intentionally — it contains all verse data

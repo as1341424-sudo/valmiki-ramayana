@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: sri-valmiki-ramayana
+    env: python
+    region: singapore           # Closest free region to India
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn server.api:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: RAMAYANA_USERNAME
+        value: admin             # Change this to your preferred username
+      - key: RAMAYANA_PASSWORD
+        value: ramayana2024      # Change this to your preferred password
+      - key: SECRET_KEY
+        generateValue: true      # Render auto-generates a secure random key
+      - key: PYTHON_VERSION
+        value: 3.11.0

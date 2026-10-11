@@ -1,0 +1,14 @@
+# ── Web Framework ─────────────────────────────────────────
+flask==3.0.3
+flask-cors==4.0.0
+flask-limiter==3.8.0
+werkzeug==3.0.3
+
+# ── Production WSGI Server ─────────────────────────────────
+gunicorn==21.2.0
+
+# ── Scraper (optional, only needed if re-scraping) ────────
+requests==2.31.0
+beautifulsoup4==4.12.3
+lxml==5.1.0
+tqdm==4.66.2

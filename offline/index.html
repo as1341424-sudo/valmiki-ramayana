@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Śrī Vālmīki Rāmāyaṇa — Offline Edition</title>
+  <meta name="description" content="Complete offline searchable corpus of Śrī Vālmīki Rāmāyaṇa — Sanskrit, transliteration, word meaning, translation and commentary.">
+  <style>
+/* ─── Reset ──────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:       #faf7f2;
+  --bg2:      #f2ece0;
+  --bg3:      #ebe1cf;
+  --white:    #ffffff;
+  --border:   #ddd0b8;
+  --border2:  #c9b898;
+  --text:     #1e1608;
+  --text2:    #5a4a30;
+  --text3:    #8c7654;
+  --saffron:  #b85a10;
+  --saffron2: #d97030;
+  --gold:     #a07820;
+  --link:     #7a3a08;
+  --shadow:   0 1px 3px rgba(0,0,0,.08);
+  --shadow2:  0 4px 20px rgba(0,0,0,.12);
+  --radius:   8px;
+  --f-body:   Georgia,"Times New Roman",serif;
+  --f-ui:     -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --f-deva:   "Noto Serif Devanagari","Mangal","Sanskrit Text",serif;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--f-body);line-height:1.7;min-height:100vh}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+img{display:block}
+.hidden{display:none!important}
+
+/* ─── Layout ─────────────────────────────────────────────────────── */
+.wrap{max-width:860px;margin:0 auto;padding:0 18px}
+
+/* ─── Header ─────────────────────────────────────────────────────── */
+.header{
+  background:var(--white);
+  border-bottom:2px solid var(--saffron);
+  position:sticky;top:0;z-index:100;
+  box-shadow:var(--shadow);
+}
+.header-inner{
+  max-width:860px;margin:0 auto;padding:10px 18px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.brand{display:flex;align-items:center;gap:10px;line-height:1.25;text-decoration:none}
+.brand-logo{height:44px;width:auto;display:block;flex-shrink:0}
+.brand-text{display:flex;flex-direction:column;gap:1px}
+.brand-deva{font-family:var(--f-deva);font-size:1.15rem;color:var(--saffron);line-height:1.2}
+.brand-en{font-family:var(--f-ui);font-size:.65rem;color:var(--text3);letter-spacing:.04em}
+.header-badge{
+  font-family:var(--f-ui);font-size:.68rem;
+  background:var(--bg2);border:1px solid var(--border);
+  color:var(--text2);padding:3px 10px;border-radius:20px;white-space:nowrap;
+}
+
+/* ─── Search bar ─────────────────────────────────────────────────── */
+.search-bar{
+  background:var(--white);
+  border-bottom:1px solid var(--border);
+  padding:16px 0 12px;
+}
+.search-row{display:flex;gap:8px;align-items:center}
+.search-field{
+  flex:1;display:flex;align-items:center;
+  background:var(--bg);border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:0 12px;
+  transition:border-color .18s,background .18s;
+}
+.search-field:focus-within{border-color:var(--saffron);background:var(--white)}
+.ico{color:var(--text3);flex-shrink:0;line-height:0;margin-right:8px}
+.search-input{
+  flex:1;border:none;background:transparent;
+  font-family:var(--f-body);font-size:.95rem;color:var(--text);
+  padding:10px 0;outline:none;
+}
+.search-input::placeholder{color:var(--text3)}
+.btn-x{
+  background:none;border:none;cursor:pointer;line-height:0;
+  color:var(--text3);padding:4px;border-radius:4px;flex-shrink:0;
+}
+.btn-x:hover{background:var(--bg2);color:var(--text)}
+
+.filters{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  margin-top:10px;font-family:var(--f-ui);font-size:.75rem;color:var(--text3);
+}
+.sel{
+  font-family:var(--f-ui);font-size:.78rem;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:6px;padding:5px 10px;color:var(--text);cursor:pointer;
+}
+.sel:focus{outline:none;border-color:var(--saffron)}
+.chk-label{display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--text2)}
+.chk-label input{accent-color:var(--saffron);cursor:pointer}
+
+.hints{margin-top:9px;font-family:var(--f-ui);font-size:.75rem;color:var(--text3)}
+.hl{color:var(--link);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+
+/* ─── Main ───────────────────────────────────────────────────────── */
+.main{padding:24px 0 70px}
+
+/* ─── Status ─────────────────────────────────────────────────────── */
+.status{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--f-ui);font-size:.8rem;color:var(--text3);margin-bottom:14px;
+}
+.spin{
+  width:14px;height:14px;border-radius:50%;flex-shrink:0;
+  border:2px solid var(--border);border-top-color:var(--saffron);
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{
+  background:#fff5f5;border:1px solid #f5c0c0;border-radius:var(--radius);
+  padding:14px 16px;font-family:var(--f-ui);font-size:.83rem;color:#8b0000;
+  line-height:1.6;
+}
+.err code{background:#ffe8e8;border-radius:3px;padding:0 4px;font-size:.8rem}
+
+/* ─── Welcome ────────────────────────────────────────────────────── */
+.wc-heading{
+  font-family:var(--f-ui);font-size:.75rem;text-transform:uppercase;
+  letter-spacing:.09em;color:var(--text3);margin-bottom:14px;
+}
+.kanda-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:12px;margin-bottom:32px;
+}
+.kanda-card{
+  background:var(--white);
+  border:1px solid var(--border);
+  border-left:4px solid var(--saffron);
+  border-radius:var(--radius);
+  padding:16px 18px;cursor:pointer;
+  display:flex;align-items:flex-start;gap:14px;
+  transition:border-color .15s,box-shadow .18s,background .15s;
+}
+.kanda-card:hover{
+  border-color:var(--saffron2);
+  border-left-color:var(--saffron2);
+  box-shadow:0 4px 14px rgba(0,0,0,.10);
+  background:var(--bg);
+}
+.kc-icon{font-size:1.6rem;line-height:1;flex-shrink:0;margin-top:2px}
+.kc-body{display:flex;flex-direction:column;gap:3px}
+.kc-num{font-family:var(--f-ui);font-size:.62rem;text-transform:uppercase;
+  letter-spacing:.07em;color:var(--text3)}
+.kc-name{font-size:1rem;font-weight:700;color:var(--saffron);line-height:1.25}
+.kc-sanskrit{font-family:var(--f-deva);font-size:.78rem;color:var(--text2)}
+.kc-meta{
+  font-family:var(--f-ui);font-size:.7rem;color:var(--text3);
+  margin-top:4px;display:flex;gap:8px;
+}
+.kc-meta span{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:20px;padding:2px 8px;
+}
+
+.tip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tip-card{
+  background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 16px;
+}
+.tip-ico{font-size:1.1rem;margin-bottom:5px}
+.tip-title{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:4px}
+.tip-body{font-family:var(--f-ui);font-size:.73rem;color:var(--text2);line-height:1.55}
+.tip-body code{background:var(--bg2);border-radius:3px;padding:0 4px;font-size:.75rem}
+
+/* ─── Results ────────────────────────────────────────────────────── */
+.res-meta{
+  font-family:var(--f-ui);font-size:.75rem;color:var(--text3);
+  margin-bottom:12px;
+}
+.res-meta strong{color:var(--text2)}
+
+.r-card{
+  background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px 18px;margin-bottom:8px;cursor:pointer;
+  transition:border-color .15s,box-shadow .15s;
+}
+.r-card:hover{border-color:var(--saffron2);box-shadow:var(--shadow)}
+.r-card:focus{outline:2px solid var(--saffron);outline-offset:2px}
+
+.r-meta{
+  display:flex;align-items:center;flex-wrap:wrap;gap:6px;
+  font-family:var(--f-ui);font-size:.68rem;color:var(--text3);margin-bottom:7px;
+}
+.r-ref{font-weight:700;color:var(--saffron);font-size:.72rem}
+.r-skt{font-family:var(--f-deva);font-size:.95rem;color:var(--text2);margin-bottom:6px;line-height:1.75;text-align:center;white-space:pre-line}
+.r-iast{font-style:italic;font-size:.82rem;color:var(--text3);margin-bottom:7px;text-align:center;white-space:pre-line}
+.r-trans{font-size:.88rem;color:var(--text);line-height:1.6}
+
+mark{background:#ffe97a;color:inherit;border-radius:2px;padding:0 1px}
+
+.load-more{text-align:center;margin-top:18px}
+.btn-more{
+  font-family:var(--f-ui);font-size:.8rem;
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:6px;padding:8px 24px;cursor:pointer;color:var(--text2);
+  transition:border-color .15s;
+}
+.btn-more:hover{border-color:var(--saffron);color:var(--text)}
+
+/* ─── Modal ──────────────────────────────────────────────────────── */
+.backdrop{
+  display:none;position:fixed;inset:0;
+  background:rgba(20,12,0,.4);z-index:200;
+  align-items:flex-start;justify-content:center;
+  padding:20px 16px;overflow-y:auto;
+}
+.backdrop.open{display:flex}
+.modal{
+  background:var(--white);border:1px solid var(--border);border-radius:12px;
+  width:100%;max-width:720px;margin:auto;
+  padding:28px 28px 22px;position:relative;
+  box-shadow:var(--shadow2);
+}
+.m-close{
+  position:absolute;top:12px;right:12px;
+  background:none;border:none;cursor:pointer;
+  color:var(--text3);padding:5px;line-height:0;border-radius:5px;
+}
+.m-close:hover{background:var(--bg2);color:var(--text)}
+
+.m-crumb{font-family:var(--f-ui);font-size:.68rem;color:var(--text3);margin-bottom:3px}
+.m-crumb a{color:var(--saffron2);font-size:.7rem}
+.m-ref{font-size:1.05rem;font-weight:700;color:var(--saffron);margin-bottom:16px}
+
+.sec-label{
+  font-family:var(--f-ui);font-size:.62rem;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--text3);
+  display:flex;align-items:center;gap:6px;margin:16px 0 5px;
+}
+.sec-label::after{content:"";flex:1;height:1px;background:var(--border)}
+
+.v-skt{
+  font-family:var(--f-deva);
+  font-size:1.15rem;
+  line-height:2.1;
+  color:var(--text);
+  text-align:center;
+  white-space:pre-line;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px 18px;
+  margin:8px 0;
+}
+.v-iast{
+  font-style:italic;
+  font-size:.9rem;
+  line-height:1.9;
+  color:var(--text2);
+  text-align:center;
+  white-space:pre-line;
+  margin:6px 0 10px;
+}
+.v-wm, .v-trans{font-size:.9rem;line-height:1.7;color:var(--text)}
+.v-comm{
+  font-size:.83rem;line-height:1.85;color:var(--text2);
+  white-space:pre-wrap;
+  max-height:300px;overflow-y:auto;
+  background:var(--bg);border:1px solid var(--border);border-radius:6px;
+  padding:10px 14px;
+}
+.v-comm::-webkit-scrollbar{width:5px}
+.v-comm::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+.m-nav{
+  display:flex;gap:8px;justify-content:space-between;
+  margin-top:22px;padding-top:14px;border-top:1px solid var(--border);
+}
+.btn-nav{
+  font-family:var(--f-ui);font-size:.75rem;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:6px;padding:7px 14px;cursor:pointer;color:var(--text2);
+  transition:border-color .15s;
+}
+.btn-nav:hover{border-color:var(--saffron)}
+.btn-nav:disabled{opacity:.35;cursor:default;pointer-events:none}
+
+/* ─── Footer ─────────────────────────────────────────────────────── */
+.footer{
+  border-top:1px solid var(--border);padding:16px 0;text-align:center;
+  font-family:var(--f-ui);font-size:.7rem;color:var(--text3);
+}
+.footer a{color:var(--link)}
+
+/* ─── Responsive ─────────────────────────────────────────────────── */
+@media(max-width:520px){
+  .modal{padding:16px}
+  .kanda-grid,.tip-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:360px){
+  .kanda-grid,.tip-grid{grid-template-columns:1fr}
+}
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <img class="brand-logo" src="iskcon_logo.jpg" alt="ISKCON Lotus Logo">
+      <div class="brand-text">
+        <div class="brand-deva">श्रीवाल्मीकिरामायणम्</div>
+        <div class="brand-en">Śrī Vālmīki Rāmāyaṇa · Offline Edition</div>
+      </div>
+    </div>
+    <span class="header-badge" id="hdrBadge">Loading…</span>
+  </div>
+</header>
+
+<!-- SEARCH BAR -->
+<div class="search-bar">
+  <div class="wrap">
+    <div class="search-row">
+      <div class="search-field">
+        <span class="ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+        </span>
+        <input class="search-input" id="q"
+          type="text"
+          placeholder="Search (Narada, dharma…) or verse ref (1.1.1, 2.3.5…)"
+          autocomplete="off" spellcheck="false">
+        <button class="btn-x hidden" id="btnX" title="Clear">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="filters">
+      <span>Filter:</span>
+      <select class="sel" id="selKanda">
+        <option value="">All Kāṇḍas</option>
+        <option value="1">1 · Bāla-kāṇḍa</option>
+        <option value="2">2 · Ayodhyā-kāṇḍa</option>
+        <option value="3">3 · Āraṇya-kāṇḍa</option>
+        <option value="4">4 · Kiṣkindhā-kāṇḍa</option>
+        <option value="5">5 · Sundara-kāṇḍa</option>
+        <option value="6">6 · Yuddha-kāṇḍa</option>
+        <option value="7">7 · Uttara-kāṇḍa</option>
+      </select>
+      <span style="margin-left:6px">Search in:</span>
+      <label class="chk-label"><input type="checkbox" id="cSkt" checked> Sanskrit</label>
+      <label class="chk-label"><input type="checkbox" id="cTrans" checked> Translation</label>
+      <label class="chk-label"><input type="checkbox" id="cComm" checked> Commentary</label>
+    </div>
+
+    <div class="hints" id="hints">
+      Try:
+      <span class="hl" data-ref="1.1.1">1.1.1</span> ·
+      <span class="hl" data-ref="1.2.1">1.2.1</span> ·
+      <span class="hl" data-q="Narada">Narada</span> ·
+      <span class="hl" data-q="Sita">Sita</span> ·
+      <span class="hl" data-q="dharma">dharma</span> ·
+      <span class="hl" data-q="austerity">austerity</span> ·
+      <span class="hl" data-q="surrender">surrender</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="wrap">
+
+    <div class="status hidden" id="statusRow">
+      <div class="spin"></div><span id="statusTxt">Searching…</span>
+    </div>
+
+    <div class="err hidden" id="errBox">
+      <strong>⚠ data.js not found.</strong><br>
+      Run <code>python export_data.py</code> first, then open this file again.
+      Make sure <code>data.js</code> and <code>index.html</code> are in the same folder.
+    </div>
+
+    <div class="res-meta hidden" id="resMeta"></div>
+    <div id="resList"></div>
+    <div class="load-more hidden" id="moreWrap">
+      <button class="btn-more" id="btnMore">Load more results</button>
+    </div>
+
+    <!-- Welcome -->
+    <div id="welcome">
+      <div class="wc-heading">Browse by Kāṇḍa — click any card to read all its verses</div>
+      <div class="kanda-grid" id="kandaGrid"></div>
+
+      <div class="tip-grid">
+        <div class="tip-card">
+          <div class="tip-ico">📖</div>
+          <div class="tip-title">Verse lookup</div>
+          <div class="tip-body">
+            Type <code>1.1.1</code> → Kāṇḍa 1, Ch. 1, Verse 1.<br>
+            <code>1.1.19</code> and <code>1.1.20</code> both open the combined 19–20 entry.
+          </div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-ico">🔍</div>
+          <div class="tip-title">Full-text search</div>
+          <div class="tip-body">
+            Searches Sanskrit, IAST, word meanings, translation &amp; commentary instantly — 100% offline, no internet needed.
+          </div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-ico">📚</div>
+          <div class="tip-title">Browse by Kāṇḍa</div>
+          <div class="tip-body">
+            Click any Kāṇḍa card above to browse all its verses. Use the filter dropdown to narrow search results.
+          </div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-ico">⌨</div>
+          <div class="tip-title">Keyboard shortcuts</div>
+          <div class="tip-body">
+            <b>←  →</b> navigate verses in modal<br>
+            <b>Esc</b> close modal<br>
+            <b>Enter</b> search
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="backdrop" id="backdrop">
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <button class="m-close" id="mClose" title="Close (Esc)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M18 6 6 18M6 6l12 12"/>
+      </svg>
+    </button>
+    <div id="mBody"></div>
+    <div class="m-nav">
+      <button class="btn-nav" id="btnPrev">← Previous verse</button>
+      <button class="btn-nav" id="btnNext">Next verse →</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    Content sourced from
+    <a href="https://srivalmikiramayana.com" target="_blank" rel="noopener">srivalmikiramayana.com</a>
+    — Rūpa Raghunātha Vāṇī Publications — Local offline corpus for personal study
+  </div>
+</footer>
+
+<!-- DATA (generated by export_data.py) -->
+<script src="data.js"></script>
+
+<script>
+/* ── Offline Rāmāyaṇa App ─────────────────────────────────────────
+   No server, no network. All data embedded in data.js.
+──────────────────────────────────────────────────────────────────*/
+(function(){
+"use strict";
+
+/* ── Data ───────────────────────────────────────────────────────── */
+let V=[], IDX={}, STATS={};
+
+/* ── State ──────────────────────────────────────────────────────── */
+let results=[], shown=0, modalVi=-1, lastQ="";
+const PG=20;
+
+/* ── Refs ───────────────────────────────────────────────────────── */
+const $=id=>document.getElementById(id);
+const qEl=$("q"), btnX=$("btnX"), selK=$("selKanda");
+const cSkt=$("cSkt"), cTrans=$("cTrans"), cComm=$("cComm");
+const statusRow=$("statusRow"), errBox=$("errBox");
+const resMeta=$("resMeta"), resList=$("resList");
+const moreWrap=$("moreWrap"), btnMore=$("btnMore");
+const welcome=$("welcome"), kandaGrid=$("kandaGrid");
+const hdrBadge=$("hdrBadge");
+const backdrop=$("backdrop"), mClose=$("mClose"), mBody=$("mBody");
+const btnPrev=$("btnPrev"), btnNext=$("btnNext");
+
+const KNAMES={
+  1:"Bāla-kāṇḍa", 2:"Ayodhyā-kāṇḍa", 3:"Āraṇya-kāṇḍa",
+  4:"Kiṣkindhā-kāṇḍa", 5:"Sundara-kāṇḍa", 6:"Yuddha-kāṇḍa", 7:"Uttara-kāṇḍa"
+};
+
+/* ── Init ───────────────────────────────────────────────────────── */
+function init(){
+  if(!window.RAMAYANA_DATA){ errBox.classList.remove("hidden"); return; }
+  V=window.RAMAYANA_DATA.verses;
+  IDX=window.RAMAYANA_DATA.index;
+  STATS=window.RAMAYANA_DATA.stats;
+  hdrBadge.textContent=STATS.total_verses.toLocaleString()+" verses";
+  buildKandas();
+  events();
+  const h=location.hash.slice(1);
+  if(h){ qEl.value=decodeURIComponent(h); btnX.classList.remove("hidden"); search(qEl.value.trim()); }
+}
+
+/* ── Kanda cards ────────────────────────────────────────────────── */
+const KICONS={1:"🌅",2:"🏙️",3:"🌿",4:"🐒",5:"🌊",6:"⚔️",7:"📜"};
+const KSKT={
+  1:"बालकाण्डः", 2:"अयोध्याकाण्डः", 3:"आरण्यकाण्डः",
+  4:"किष्किन्धाकाण्डः", 5:"सुन्दरकाण्डः", 6:"युद्धकाण्डः", 7:"उत्तरकाण्डः"
+};
+function buildKandas(){
+  kandaGrid.innerHTML="";
+  const ks=STATS.kandas;
+  if(!Object.keys(ks).length){
+    kandaGrid.innerHTML='<p style="color:var(--text3);font-size:.85rem;grid-column:1/-1">No verses scraped yet. Run python scraper/scrape.py first.</p>';
+    return;
+  }
+  for(const[num,d] of Object.entries(ks)){
+    const c=document.createElement("div");
+    c.className="kanda-card";
+    c.innerHTML=`<div class="kc-icon">${KICONS[num]||"📖"}</div>
+      <div class="kc-body">
+        <div class="kc-num">Kāṇḍa ${num}</div>
+        <div class="kc-name">${KNAMES[num]||d.name}</div>
+        <div class="kc-sanskrit">${KSKT[num]||""}</div>
+        <div class="kc-meta">
+          <span>${d.verses.toLocaleString()} verses</span>
+          <span>${d.chapters} chapters</span>
+        </div>
+      </div>`;
+    c.onclick=()=>{ selK.value=num; qEl.value=""; btnX.classList.add("hidden"); browseKanda(+num); };
+    kandaGrid.appendChild(c);
+  }
+}
+
+/* ── Events ─────────────────────────────────────────────────────── */
+function events(){
+  let t;
+  qEl.addEventListener("input",()=>{
+    const v=qEl.value; btnX.classList.toggle("hidden",!v.length);
+    clearTimeout(t); t=setTimeout(()=>search(v.trim()),260);
+  });
+  qEl.addEventListener("keydown",e=>{ if(e.key==="Enter"){ clearTimeout(t); search(qEl.value.trim()); }});
+  btnX.onclick=()=>{ qEl.value=""; btnX.classList.add("hidden"); qEl.focus(); showWelcome(); location.hash=""; };
+  selK.onchange=()=>{ if(qEl.value.trim()||selK.value) search(qEl.value.trim()); else showWelcome(); };
+  [cSkt,cTrans,cComm].forEach(c=>c.onchange=()=>{ if(qEl.value.trim()) search(qEl.value.trim()); });
+  btnMore.onclick=()=>renderMore();
+
+  document.querySelectorAll(".hl[data-q]").forEach(a=>a.onclick=()=>{ qEl.value=a.dataset.q; btnX.classList.remove("hidden"); search(a.dataset.q); });
+  document.querySelectorAll(".hl[data-ref]").forEach(a=>a.onclick=()=>{ qEl.value=a.dataset.ref; btnX.classList.remove("hidden"); search(a.dataset.ref); });
+
+  mClose.onclick=closeModal;
+  backdrop.onclick=e=>{ if(e.target===backdrop) closeModal(); };
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape") closeModal();
+    if(backdrop.classList.contains("open")){
+      if(e.key==="ArrowLeft") nav(-1);
+      if(e.key==="ArrowRight") nav(+1);
+    }
+  });
+  btnPrev.onclick=()=>nav(-1);
+  btnNext.onclick=()=>nav(+1);
+}
+
+/* ── Verse-ref pattern ──────────────────────────────────────────── */
+const REF=/^(\d+)\.(\d+)\.(\d+)(?:-(\d+))?$/;
+function findRef(ref){
+  const m=ref.match(REF); if(!m) return -1;
+  const k=+m[1],c=+m[2],v=+m[3];
+  return V.findIndex(x=>x.kanda_num===k&&x.chapter_num===c&&x.verse_num_start<=v&&v<=x.verse_num_end);
+}
+
+/* ── Tokeniser ──────────────────────────────────────────────────── */
+function tok(s){
+  return [...s.toLowerCase().matchAll(/[a-zA-ZāĀīĪūŪṛṝḷḹēōṃḥñṭḍṇśṣṁĀāĪīŪūṚṝḶḸĒŌṂḤÑṬḌṆŚṢṁ]+/g)]
+    .map(m=>m[0].slice(0,24)).filter(w=>w.length>=3);
+}
+
+/* ── Browse kanda ───────────────────────────────────────────────── */
+function browseKanda(k){
+  results=V.map((_,i)=>i).filter(i=>V[i].kanda_num===k);
+  renderResults("",`Browsing ${KNAMES[k]||"Kāṇḍa "+k}`);
+}
+
+/* ── Main search ────────────────────────────────────────────────── */
+function search(q){
+  lastQ=q; location.hash=q?encodeURIComponent(q):"";
+  if(!q&&!selK.value){ showWelcome(); return; }
+
+  // Verse ref?
+  if(REF.test(q.trim())){
+    const i=findRef(q.trim());
+    if(i>=0){ openModal(i); return; }
+  }
+
+  const tokens=tok(q);
+  const kf=+selK.value||0;
+  const qlo=q.toLowerCase();
+
+  let hits;
+  if(!tokens.length){
+    hits=V.map((_,i)=>({i,sc:1}));
+  } else {
+    const sm={};
+    for(const t of tokens){
+      (IDX[t]||[]).forEach(vi=>sm[vi]=(sm[vi]||0)+2);
+      for(const[k,list] of Object.entries(IDX))
+        if(k!==t&&k.startsWith(t)) list.forEach(vi=>sm[vi]=(sm[vi]||0)+1);
+    }
+    hits=Object.entries(sm).map(([vi,sc])=>({i:+vi,sc})).sort((a,b)=>b.sc-a.sc);
+  }
+
+  hits=hits.filter(h=>{
+    const v=V[h.i];
+    if(kf&&v.kanda_num!==kf) return false;
+    if(!tokens.length) return true;
+    const fields=[];
+    if(cSkt.checked) fields.push(v.sanskrit,v.transliteration,v.word_meaning);
+    if(cTrans.checked) fields.push(v.translation);
+    if(cComm.checked) fields.push(v.commentary);
+    return fields.some(f=>f&&f.toLowerCase().includes(qlo.slice(0,60)));
+  });
+
+  results=hits.map(h=>h.i);
+  renderResults(q);
+}
+
+/* ── Render ─────────────────────────────────────────────────────── */
+function showWelcome(){
+  welcome.classList.remove("hidden");
+  resMeta.classList.add("hidden");
+  resList.innerHTML="";
+  moreWrap.classList.add("hidden");
+}
+
+function renderResults(q,label){
+  welcome.classList.add("hidden");
+  resList.innerHTML=""; shown=0;
+  const n=results.length;
+  if(!n){
+    resMeta.classList.remove("hidden");
+    resMeta.innerHTML=q?`No results for <strong>"${esc(q)}"</strong>. Try a different term.`:`No verses available.`;
+    moreWrap.classList.add("hidden"); return;
+  }
+  resMeta.classList.remove("hidden");
+  resMeta.innerHTML=label
+    ?`<strong>${n.toLocaleString()}</strong> verses — ${esc(label)}`
+    :`<strong>${n.toLocaleString()}</strong> result${n!==1?"s":""} for <strong>"${esc(q)}"</strong>`;
+  renderMore(q);
+}
+
+function renderMore(q){
+  q=q!==undefined?q:lastQ;
+  const end=Math.min(shown+PG,results.length);
+  for(let i=shown;i<end;i++) resList.appendChild(mkCard(results[i],q));
+  shown=end;
+  moreWrap.classList.toggle("hidden",shown>=results.length);
+}
+
+function mkCard(vi,q){
+  const v=V[vi];
+  const d=document.createElement("div");
+  d.className="r-card"; d.tabIndex=0;
+  const skt=(v.sanskrit||"").split("\n")[0].trim();
+  const iast=(v.transliteration||"").split("\n")[0].trim();
+  const trans=v.translation?v.translation.slice(0,230)+(v.translation.length>230?"…":""):"";
+  const chTitle=(v.chapter_title||"").replace(/^Chapter \d+\s*/i,"").slice(0,55);
+  d.innerHTML=`
+    <div class="r-meta">
+      <span class="r-ref">${esc(v.verse_ref)}</span>
+      <span>${esc(v.kanda_name||"")} · Ch. ${v.chapter_num}</span>
+      ${chTitle?`<span>· ${esc(chTitle)}</span>`:""}
+    </div>
+    ${skt?`<div class="r-skt">${hi(esc(skt),q)}</div>`:""}
+    ${iast?`<div class="r-iast">${hi(esc(iast),q)}</div>`:""}
+    ${trans?`<div class="r-trans">${hi(esc(trans),q)}</div>`:""}`;
+  d.onclick=()=>openModal(vi);
+  d.onkeydown=e=>{ if(e.key==="Enter") openModal(vi); };
+  return d;
+}
+
+/* ── Modal ──────────────────────────────────────────────────────── */
+function openModal(vi){
+  modalVi=vi; renderModal(vi);
+  backdrop.classList.add("open");
+  document.body.style.overflow="hidden";
+  mClose.focus();
+}
+function closeModal(){
+  backdrop.classList.remove("open");
+  document.body.style.overflow="";
+  modalVi=-1;
+}
+function nav(d){
+  if(modalVi<0) return;
+  const n=modalVi+d;
+  if(n>=0&&n<V.length){ modalVi=n; renderModal(n); }
+}
+
+function renderModal(vi){
+  const v=V[vi], q=lastQ;
+  btnPrev.disabled=vi<=0; btnNext.disabled=vi>=V.length-1;
+  const chTitle=(v.chapter_title||"").replace(/^Chapter \d+\s*/i,"").trim()||`Chapter ${v.chapter_num}`;
+  let h=`
+    <div class="m-crumb">
+      ${esc(v.kanda_name||"")} · ${esc(chTitle)}
+      ${v.url?` · <a href="${esc(v.url)}" target="_blank" rel="noopener">↗ source</a>`:""}
+    </div>
+    <div class="m-ref">${esc(v.verse_ref)}</div>`;
+  if(v.sanskrit)        h+=sec("Sanskrit")+`<div class="v-skt">${hi(esc(v.sanskrit),q)}</div>`;
+  if(v.transliteration) h+=sec("Transliteration (IAST)")+`<div class="v-iast">${hi(esc(v.transliteration),q)}</div>`;
+  if(v.word_meaning)    h+=sec("Word by word")+`<div class="v-wm">${hi(esc(v.word_meaning),q)}</div>`;
+  if(v.translation)     h+=sec("Translation")+`<div class="v-trans">${hi(esc(v.translation),q)}</div>`;
+  if(v.commentary)      h+=sec("Commentary")+`<div class="v-comm">${hi(esc(v.commentary),q)}</div>`;
+  mBody.innerHTML=h;
+  mBody.scrollTop=0;
+}
+
+/* ── Helpers ────────────────────────────────────────────────────── */
+function sec(label){ return `<div class="sec-label">${label}</div>`; }
+function esc(s){ if(!s)return""; return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function hi(html,q){
+  if(!q||q.length<2) return html;
+  const safe=q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  try{ return html.replace(new RegExp(`(${safe})`,"gi"),"<mark>$1</mark>"); }catch{ return html; }
+}
+
+document.addEventListener("DOMContentLoaded",init);
+})();
+</script>
+</body>
+</html>
